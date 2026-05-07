@@ -1,4 +1,7 @@
 {
+  "name": "se_project_express",
+  "author": "Stanley Garrett III",
+  "license": "UNLICENSED",
   "dependencies": {
     "express": "^4.22.1",
     "mongoose": "^8.23.0",
