@@ -1,5 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
-const { NOT_FOUND, handleError } = require("../utils/errors");
+const { handleError } = require("../utils/errors");
 
 const getItems = (req, res) => {
   ClothingItem.find()
@@ -33,7 +33,7 @@ const likeItem = (req, res) => {
       if (err.statusCode === 404) {
         return res.status(404).send({ message: err.message });
       }
-      handleError(res, err);
+      return handleError(res, err);
     });
 };
 
@@ -55,7 +55,7 @@ const unlikeItem = (req, res) => {
       if (err.statusCode === 404) {
         return res.status(404).send({ message: err.message });
       }
-      handleError(res, err);
+      return handleError(res, err);
     });
 };
 
@@ -68,12 +68,12 @@ const deleteItem = (req, res) => {
       error.statusCode = 404;
       throw error;
     })
-    .then((item) => res.send({ message: "Item deleted successfully" }))
+    .then(() => res.send({ message: "Item deleted successfully" }))
     .catch((err) => {
       if (err.statusCode === 404) {
         return res.status(404).send({ message: err.message });
       }
-      handleError(res, err);
+      return handleError(res, err);
     });
 };
 

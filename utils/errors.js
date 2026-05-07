@@ -5,8 +5,6 @@ const INTERNAL_SERVER_ERROR = 500;
 const DEFAULT_ERROR_MESSAGE = "Internal Server Error";
 
 const handleError = (res, err) => {
-  console.error(err);
-
   if (err.name === "ValidationError" || err.name === "CastError") {
     return res.status(BAD_REQUEST).send({ message: err.message });
   }
