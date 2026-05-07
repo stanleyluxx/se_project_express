@@ -6,6 +6,7 @@ const {
   unlikeItem,
   deleteItem,
 } = require("../controllers/clothingItems");
+const { NOT_FOUND } = require("../utils/errors");
 
 router.get("/", getItems);
 router.post("/", createItem);
@@ -14,7 +15,7 @@ router.delete("/:itemId/likes", unlikeItem);
 router.delete("/:itemId", deleteItem);
 
 router.use((req, res) => {
-  res.status(404).send({ message: "Requested resource not found" });
+  res.status(NOT_FOUND).send({ message: "Requested resource not found" });
 });
 
 module.exports = router;

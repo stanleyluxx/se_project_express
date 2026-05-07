@@ -1,5 +1,6 @@
 const ClothingItem = require("../models/clothingItem");
 const { handleError } = require("../utils/errors");
+const { NOT_FOUND } = require("../utils/errors");
 
 const getItems = (req, res) => {
   ClothingItem.find()
@@ -25,12 +26,12 @@ const likeItem = (req, res) => {
   )
     .orFail(() => {
       const error = new Error("Item not found");
-      error.statusCode = 404;
+      error.statusCode = NOT_FOUND;
       throw error;
     })
     .then((item) => res.send(item))
     .catch((err) => {
-      if (err.statusCode === 404) {
+      if (err.statusCode === NOT_FOUND) {
         return res.status(404).send({ message: err.message });
       }
       return handleError(res, err);
@@ -47,12 +48,12 @@ const unlikeItem = (req, res) => {
   )
     .orFail(() => {
       const error = new Error("Item not found");
-      error.statusCode = 404;
+      error.statusCode = NOT_FOUND;
       throw error;
     })
     .then((item) => res.send(item))
     .catch((err) => {
-      if (err.statusCode === 404) {
+      if (err.statusCode === NOT_FOUND) {
         return res.status(404).send({ message: err.message });
       }
       return handleError(res, err);
@@ -65,12 +66,12 @@ const deleteItem = (req, res) => {
   ClothingItem.findByIdAndDelete(itemId)
     .orFail(() => {
       const error = new Error("Item not found");
-      error.statusCode = 404;
+      error.statusCode = NOT_FOUND;
       throw error;
     })
     .then(() => res.send({ message: "Item deleted successfully" }))
     .catch((err) => {
-      if (err.statusCode === 404) {
+      if (err.statusCode === NOT_FOUND) {
         return res.status(404).send({ message: err.message });
       }
       return handleError(res, err);
