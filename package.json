@@ -17,6 +17,7 @@
   },
   "scripts": {
     "start": "node app.js",
-    "lint": "npx eslint ."
+    "lint": "npx eslint .",
+    "dev": "nodemon app.js"
   }
 }

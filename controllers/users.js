@@ -11,15 +11,15 @@ const getUsers = (req, res) => {
 // GET /users/:userId — returns a single user by _id
 const getUser = (req, res) => {
   const { userId } = req.params;
-
   User.findById(userId)
-    .then((user) => {
-      if (!user) {
+    .orFail()
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND).send({ message: "User not found" });
       }
-      return res.send(user);
-    })
-    .catch((err) => handleError(res, err));
+      return handleError(res, err);
+    });
 };
 
 // POST /users — creates a new user

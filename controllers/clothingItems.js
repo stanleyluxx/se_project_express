@@ -1,6 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
 const { handleError } = require("../utils/errors");
-const { NOT_FOUND } = require("../utils/errors");
 
 const getItems = (req, res) => {
   ClothingItem.find()
@@ -24,15 +23,11 @@ const likeItem = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => {
-      const error = new Error("Item not found");
-      error.statusCode = NOT_FOUND;
-      throw error;
-    })
+    .orFail()
     .then((item) => res.send(item))
     .catch((err) => {
-      if (err.statusCode === NOT_FOUND) {
-        return res.status(404).send({ message: err.message });
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: "Item not found" });
       }
       return handleError(res, err);
     });
@@ -46,15 +41,11 @@ const unlikeItem = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true }
   )
-    .orFail(() => {
-      const error = new Error("Item not found");
-      error.statusCode = NOT_FOUND;
-      throw error;
-    })
+    .orFail()
     .then((item) => res.send(item))
     .catch((err) => {
-      if (err.statusCode === NOT_FOUND) {
-        return res.status(404).send({ message: err.message });
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: "Item not found" });
       }
       return handleError(res, err);
     });
@@ -64,15 +55,11 @@ const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
   ClothingItem.findByIdAndDelete(itemId)
-    .orFail(() => {
-      const error = new Error("Item not found");
-      error.statusCode = NOT_FOUND;
-      throw error;
-    })
+    .orFail()
     .then(() => res.send({ message: "Item deleted successfully" }))
     .catch((err) => {
-      if (err.statusCode === NOT_FOUND) {
-        return res.status(404).send({ message: err.message });
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(404).send({ message: "Item not found" });
       }
       return handleError(res, err);
     });
