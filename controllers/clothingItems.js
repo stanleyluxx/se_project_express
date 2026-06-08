@@ -1,6 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
-const { handleError } = require("../utils/errors");
-const { NOT_FOUND } = require("../utils/errors");
+const { handleError, NOT_FOUND, FORBIDDEN } = require("../utils/errors");
 
 const getItems = (req, res) => {
   ClothingItem.find()
@@ -55,9 +54,16 @@ const unlikeItem = (req, res) => {
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
-    .then((item) => ClothingItem.deleteOne(item).then(() => res.send(item)))
+    .then((item) => {
+      if (item.owner.toString() !== req.user._id.toString()) {
+        return res.status(FORBIDDEN).send({ message: "Forbidden" });
+      }
+      return ClothingItem.findByIdAndDelete(itemId).then((deletedItem) =>
+        res.send(deletedItem)
+      );
+    })
     .catch((err) => {
       if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND).send({ message: "Item not found" });

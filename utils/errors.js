@@ -1,4 +1,5 @@
 const BAD_REQUEST = 400;
+const FORBIDDEN = 403;
 const NOT_FOUND = 404;
 const INTERNAL_SERVER_ERROR = 500;
 
@@ -16,6 +17,7 @@ const handleError = (res, err) => {
 
 module.exports = {
   BAD_REQUEST,
+  FORBIDDEN,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
   handleError,
