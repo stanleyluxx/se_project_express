@@ -69,7 +69,7 @@ const login = (req, res) => {
   if (!email || !password) {
     return res.status(400).send({ message: "Email and password are required" });
   }
-  User.findOne({ email })
+  return User.findOne({ email })
     .select("+password")
     .then((user) => {
       if (!user) {
