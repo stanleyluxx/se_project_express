@@ -4,8 +4,6 @@ const NOT_FOUND = 404;
 const INTERNAL_SERVER_ERROR = 500;
 
 const handleError = (res, err) => {
-  console.error(err);
-
   if (err.name === "ValidationError" || err.name === "CastError") {
     return res.status(BAD_REQUEST).send({ message: "Invalid data" });
   }

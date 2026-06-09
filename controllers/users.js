@@ -35,7 +35,9 @@ const createUser = (req, res) => {
   return User.findOne({ email })
     .then((existing) => {
       if (existing) {
-        throw { status: 409, message: "Email already exists" };
+        const error = new Error("Email already exists");
+        error.status = 409;
+        throw error;
       }
 
       return bcrypt
@@ -78,17 +80,14 @@ const login = (req, res) => {
         if (!matched) {
           return Promise.reject(new Error("Unauthorized"));
         }
-
         const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
           expiresIn: "7d",
         });
-
         res.cookie("jwt", token, {
           httpOnly: true,
           sameSite: true,
           maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
-
         return res.send({ token });
       });
     })
