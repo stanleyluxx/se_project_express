@@ -28,6 +28,9 @@ This project utilizes a range of technologies and techniques to build a robust b
 - **Code Quality**: Employing linting and formatting tools to maintain clean, readable code.
 - **Deployment**: Strategies for deploying web applications on remote machines.
 
+### Project Video Presentation
+- **https://www.loom.com/share/af383a557859406287f1ad082f5ffdb9
+
 ## Running the Project
 
 `npm run start` — to launch the server
