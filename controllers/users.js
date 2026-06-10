@@ -1,7 +1,12 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-const { NOT_FOUND, handleError } = require("../utils/errors");
+const {
+  NOT_FOUND,
+  UNAUTHORIZED,
+  CONFLICT,
+  handleError,
+} = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
 // GET /users — returns all users
@@ -13,7 +18,7 @@ const getUsers = (req, res) => {
 
 // GET /users/:userId — returns a single user by _id, change the route to /users/me and return the current user based on the JWT payload
 const getCurrentUser = (req, res) => {
-  const userId = req.user._id || req.user.userId;
+  const userId = req.user._id;
   User.findById(userId)
     .orFail()
     .then((user) => res.send(user))
@@ -36,7 +41,7 @@ const createUser = (req, res) => {
     .then((existing) => {
       if (existing) {
         const error = new Error("Email already exists");
-        error.status = 409;
+        error.status = CONFLICT;
         throw error;
       }
 
@@ -56,7 +61,7 @@ const createUser = (req, res) => {
         return res.status(err.status).send({ message: err.message });
       }
       if (err.code === 11000) {
-        return res.status(409).send({ message: "Email already exists" });
+        return res.status(CONFLICT).send({ message: "Email already exists" });
       }
       return handleError(res, err);
     });
@@ -92,13 +97,13 @@ const login = (req, res) => {
       });
     })
     .catch(() =>
-      res.status(401).send({ message: "Invalid email or password" })
+      res.status(UNAUTHORIZED).send({ message: "Invalid email or password" })
     );
 };
 
 // PATCH /users/me — updates the current user's profile
 const updateUser = (req, res) => {
-  const userId = req.user._id || req.user.userId;
+  const userId = req.user._id;
   const { name, avatar } = req.body;
 
   User.findByIdAndUpdate(

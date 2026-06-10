@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const auth = require("../middlewares/auth");
 const {
   getItems,
   createItem,
@@ -9,6 +10,7 @@ const {
 const { NOT_FOUND } = require("../utils/errors");
 
 router.get("/", getItems);
+router.use(auth);
 router.post("/", createItem);
 router.put("/:itemId/likes", likeItem);
 router.delete("/:itemId/likes", unlikeItem);
