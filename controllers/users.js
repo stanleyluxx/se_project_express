@@ -2,9 +2,11 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const {
+  BAD_REQUEST,
   NOT_FOUND,
   UNAUTHORIZED,
   CONFLICT,
+  INTERNAL_SERVER_ERROR,
   handleError,
 } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
@@ -34,7 +36,7 @@ const getCurrentUser = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
   if (!name || !avatar || !email || !password) {
-    return res.status(400).send({ message: "All fields are required" });
+    return res.status(BAD_REQUEST).send({ message: "All fields are required" });
   }
 
   return User.findOne({ email })
@@ -72,33 +74,32 @@ const login = (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).send({ message: "Email and password are required" });
+    return res
+      .status(BAD_REQUEST)
+      .send({ message: "Email and password are required" });
   }
-  return User.findOne({ email })
-    .select("+password")
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        return Promise.reject(new Error("Unauthorized"));
-      }
-
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
-          return Promise.reject(new Error("Unauthorized"));
-        }
-        const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-          expiresIn: "7d",
-        });
-        res.cookie("jwt", token, {
-          httpOnly: true,
-          sameSite: true,
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        });
-        return res.send({ token });
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
       });
+      res.cookie("jwt", token, {
+        httpOnly: true,
+        sameSite: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+      return res.send({ token });
     })
-    .catch(() =>
-      res.status(UNAUTHORIZED).send({ message: "Invalid email or password" })
-    );
+    .catch((err) => {
+      if (err.message === "Invalid email or password") {
+        return res
+          .status(UNAUTHORIZED)
+          .send({ message: "Invalid email or password" });
+      }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
+    });
 };
 
 // PATCH /users/me — updates the current user's profile
